@@ -45,7 +45,6 @@ class ViewController: UIViewController {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd HH:mm"
                 let dateString = formatter.string(from: date)
-
                 tasks.append("\(text) (\(dateString))")
             }
         }
@@ -82,6 +81,34 @@ extension ViewController: UITableViewDelegate {
         viewController.task = tasks[indexPath.row]
         navigationController?.pushViewController(viewController, animated: true)
     }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completionHandler in
+            
+            guard let self = self else { return }
+            
+            let taskKey = "task\(indexPath.row + 1)"
+            UserDefaults().removeObject(forKey: taskKey)
+            
+            var count = UserDefaults().integer(forKey: "count")
+            count -= 1
+            UserDefaults().set(count, forKey: "count")
+            
+            self.updateTasks()
+            
+            print("Task deleted: \(taskKey)")
+            completionHandler(true)
+        }
+        
+        deleteAction.backgroundColor = UIColor.red
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        
+        return configuration
+    }
+
 }
 
 extension ViewController: UITableViewDataSource {
@@ -91,7 +118,18 @@ extension ViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "initialCell", for: indexPath)
-        cell.textLabel?.text = tasks[indexPath.row]
+        
+        let taskString = tasks[indexPath.row]
+        let parts = taskString.components(separatedBy: " (")
+        
+        let taskName = parts[0]
+        let date = parts.count > 1 ? parts[1].dropLast() : ""
+        
+        cell.textLabel?.text = taskName
+        cell.detailTextLabel?.text = String(date)
+        cell.detailTextLabel?.textColor = UIColor.gray
+        cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 12)
+        
         return cell
     }
 }
