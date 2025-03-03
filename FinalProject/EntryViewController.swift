@@ -28,28 +28,29 @@ class EntryViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func saveTask() {
-        
         guard let text = field.text, !text.isEmpty else {
             return
         }
-        
-        var count = UserDefaults().integer(forKey: "count")
-        let newCount = count + 1
-        
-        let taskData: [String: Any] = [
-            "text": text,
-            "timestamp": Date().timeIntervalSince1970
-        ]
-        
-        UserDefaults().set(taskData, forKey: "task\(newCount)")
-        UserDefaults().set(newCount, forKey: "count")
-        
-        print("Task saved: \(text) at task\(newCount)")
-        
+
+        // Get the Core Data context
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+        // Create a new TaskCoreData object
+        let newTask = Task(context: context)
+        newTask.name = text
+        newTask.timestamp = Date() // ✅ Store as Date, not TimeInterval
+
+        // Save to Core Data
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save task: \(error)")
+        }
+
         update?()
-        
         navigationController?.popViewController(animated: true)
     }
+
 
     /*
     // MARK: - Navigation

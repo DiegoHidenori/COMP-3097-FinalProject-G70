@@ -11,25 +11,25 @@ class TaskViewController: UIViewController {
     
     @IBOutlet var label: UILabel!
     
-    var task: String?
-    var timestamp: TimeInterval?
+    var task: Task?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let taskText = task, let taskTimestamp = timestamp {
-            let date = Date(timeIntervalSince1970: taskTimestamp)
+        if let taskObject = task {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm"
-            let dateString = formatter.string(from: date)
-            
-            label.text = "\(taskText)\nCreated: \(dateString)"
+            let dateString = taskObject.timestamp != nil ? formatter.string(from: taskObject.timestamp!) : "No Date"
+
+            label.text = "\(taskObject.name ?? "No Task")\nCreated: \(dateString)"
         } else {
-            label.text = task
+            label.text = "No Task"
         }
-        
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete", style: .plain, target: self, action: #selector(deleteTask))
     }
+
+
     
     @objc func deleteTask() {
         
