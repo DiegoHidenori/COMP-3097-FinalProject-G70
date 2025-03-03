@@ -2,8 +2,6 @@
 //  AppDelegate.swift
 //  FinalProject
 //
-//  Created by Ivanna Bandalak on 2025-02-14.
-//
 
 import UIKit
 import CoreData
@@ -14,7 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "TaskModel") // Make sure this name matches your .xcdatamodeld file
+        let container = NSPersistentContainer(name: "TaskModel")
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")

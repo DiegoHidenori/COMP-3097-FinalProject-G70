@@ -2,8 +2,6 @@
 //  EntryViewController.swift
 //  FinalProject
 //
-//  Created by Ivanna Bandalak on 2025-02-14.
-//
 
 import UIKit
 
@@ -32,15 +30,12 @@ class EntryViewController: UIViewController, UITextFieldDelegate {
             return
         }
 
-        // Get the Core Data context
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
-        // Create a new TaskCoreData object
         let newTask = Task(context: context)
         newTask.name = text
-        newTask.timestamp = Date() // ✅ Store as Date, not TimeInterval
+        newTask.timestamp = Date()
 
-        // Save to Core Data
         do {
             try context.save()
         } catch {

@@ -2,8 +2,6 @@
 //  ViewController.swift
 //  FinalProject
 //
-//  Created by Ivanna Bandalak on 2025-02-14.
-//
 
 import UIKit
 import CoreData
