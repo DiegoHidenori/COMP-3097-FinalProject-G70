@@ -16,17 +16,16 @@ class EntryViewController: UIViewController, UITextFieldDelegate {
         field.delegate = self
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(saveTask))
-        
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         saveTask()
-        
         return true
     }
     
     @objc func saveTask() {
-        guard let text = field.text, !text.isEmpty else {
+        guard let text = field.text?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
+            showAlert(message: "Task name cannot be empty!")
             return
         }
 
@@ -46,15 +45,9 @@ class EntryViewController: UIViewController, UITextFieldDelegate {
         navigationController?.popViewController(animated: true)
     }
 
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true)
     }
-    */
-
 }
