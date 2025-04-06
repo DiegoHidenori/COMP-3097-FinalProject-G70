@@ -1,6 +1,8 @@
 //
 //  ViewController.swift
 //  FinalProject
+//  Diego Tsukayama 101472085
+//  Illia Konik 101460488
 //
 
 import UIKit
