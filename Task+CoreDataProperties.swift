@@ -2,7 +2,7 @@
 //  Task+CoreDataProperties.swift
 //  FinalProject
 //
-//  Created by Ivanna Bandalak on 2025-03-16.
+//  Created by Ivanna Bandalak on 2025-04-06.
 //
 //
 
@@ -18,6 +18,7 @@ extension Task {
 
     @NSManaged public var name: String?
     @NSManaged public var timestamp: Date?
+    @NSManaged public var isCompleted: Bool
     @NSManaged public var subtasks: NSSet?
 
 }

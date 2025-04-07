@@ -10,13 +10,24 @@ import CoreData
 
 class TaskViewController: UIViewController, UITextFieldDelegate {
     
-    @IBOutlet var label: UILabel!
+//    @IBOutlet var label: UILabel!
+    @IBOutlet weak var taskTitle: UITextField!
     @IBOutlet var tableView: UITableView!
     @IBOutlet var subtaskTextField: UITextField!
     @IBOutlet weak var deleteButton: UIButton!
+//    @IBOutlet weak var taskTitleLabel: UILabel!
+    @IBOutlet weak var taskSubtitleLabel: UILabel!
     
     @IBAction func didTapDeleteButton(_ sender: Any) {
-        deleteTask()
+        let alert = UIAlertController(title: "Delete Task", message: "Are you sure you want to delete '\(task?.name ?? "---")' and all its subtasks?", preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            self.deleteTask()
+        }))
+
+        present(alert, animated: true, completion: nil)
     }
     var task: Task?
     var subtasks: [Subtask] = []
@@ -28,11 +39,25 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
         tableView.dataSource = self
 
         subtaskTextField.delegate = self
+        taskTitle.delegate = self
+        taskTitle.returnKeyType = .done
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
 
         fetchTaskAndSubtasks()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if let viewControllers = navigationController?.viewControllers {
+            for viewController in viewControllers {
+                if let taskListVC = viewController as? ViewController {
+                    taskListVC.fetchTasks()
+                }
+            }
+        }
     }
     
     @objc func dismissKeyboard() {
@@ -64,7 +89,10 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
         let dateString = task.timestamp != nil ? formatter.string(from: task.timestamp!) : "No Date"
         
-        label.text = "\(task.name ?? "No Task")\nCreated: \(dateString)"
+//        label.text = "\(task.name ?? "No Task")\nCreated: \(dateString)"
+//        taskTitleLabel.text = task.name ?? "No Task"
+        taskTitle.text = task.name
+        taskSubtitleLabel.text = "Created: \(dateString)"
 
         if let subtasksSet = task.subtasks as? Set<Subtask> {
             subtasks = Array(subtasksSet)
@@ -86,8 +114,30 @@ class TaskViewController: UIViewController, UITextFieldDelegate {
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        addSubtaskFromTextField()
+        if textField == subtaskTextField {
+                    addSubtaskFromTextField()
+        } else if textField == taskTitle {
+            saveTaskTitle()
+        }
+        textField.resignFirstResponder()
         return true
+    }
+    
+    func saveTaskTitle() {
+        guard let newTitle = taskTitle.text,
+              let task = task,
+              let context = task.managedObjectContext,
+              !newTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+
+        task.name = newTitle
+        do {
+            try context.save()
+            print("Task title updated")
+        } catch {
+            print("Failed to update task title: \(error)")
+        }
     }
 
     func addSubtaskFromTextField() {
